@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="WebApp" default="end">
+	<!--
+		@date 2011-08-15
+		@author fujian
+		@version 0.1
+		应用版本生成步骤：
+		1、首先确认src目录下的配置文件为现场的环境配置
+		2、是否全部引用jar文件，如果引用其他项目，请打成jar文件引用。
+	-->
+
+	<!--路径变量定义-->
+	<property name="项目名称" value="piclibraryV2" />
+	
+	<!--初始化目录结构-->
+	<target name="init">
+		<delete dir="deploy" />
+		<mkdir dir="cache" />
+		<mkdir dir="deploy" />
+	</target>
+	<path id="compile.lib">
+		<fileset dir="WebRoot/WEB-INF/lib">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="jdk7/jre/lib">
+			<include name="*.jar"/>
+		</fileset>
+                <fileset dir="jdk7/lib">
+                        <include name="*.jar"/>
+                </fileset>
+
+	</path>
+	<!--编译并复制webroot目录-->
+	<target name="compile" depends="init">
+		<javac srcdir="src" destdir="WebRoot/WEB-INF/classes" includeantruntime="false" debug="true">
+			<classpath refid="compile.lib"/>
+<!--			<compilerarg value="-XDignore.symbol.file"/>
+                        <compilerarg value="-Xlint:unchecked"/>
+                        <compilerarg value="-Xlint:deprecation"/>
+                        <compilerarg value="-Xlint"/>
+-->
+		</javac>
+
+                <copy todir="WebRoot/WEB-INF/classes">
+                        <fileset dir="resource">
+                                <include name="**" />
+                        </fileset>
+                        <fileset dir="src">
+                                <include name="*.properties" />
+                        </fileset>
+                </copy>
+
+		<copydir dest="cache/${项目名称}" src="WebRoot"/>
+
+
+		<delete defaultexcludes="false">
+			<fileset dir="cache/${项目名称}" includes="**/.svn/" />
+		</delete>
+	</target>
+	
+	<!--打成zip包-->
+	<target name="deploy" depends="compile">
+		<zip destfile="deploy/${项目名称}.zip" basedir="cache" />
+	</target>
+	
+	<!--清空缓存-->
+	<target name="end" depends="deploy">
+		<delete dir="cache" />
+	</target>
+</project>
